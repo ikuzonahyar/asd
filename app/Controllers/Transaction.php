@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Libraries\AES;
 
 use App\Models\transaction as transactionModel;
+include "Padkey.php";
 
 class Transaction extends BaseController
 {
@@ -106,7 +107,9 @@ class Transaction extends BaseController
                 if(is_uploaded_file($file_tmpname)){
                     ini_set('max_execution_time', -1);
                     ini_set('memory_limit', -1);
-                    $aes = new AES();
+                    $pad = new Paddkey();
+                    $padkey = $pad->adjustKeyLength($key, 128);
+                    $aes = new AES($padkey);
           
                     for($i=0;$i<$banyak;$i++){
                         $data    = fread($file_source, 16);
@@ -168,7 +171,7 @@ class Transaction extends BaseController
 
             $mod        = $file_size%16;
 
-            $aes        = new AES();
+            $aes        = new AES($padkey);
             $fopen1     = fopen($file_path, "rb");
             $plain      = "";
             $cache      = ".\\..\\public\\file\\$file_name";
